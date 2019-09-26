@@ -1,33 +1,68 @@
 $("#acct-new").on("click", function(event) {
     $("div.card-header > h3").text("Create new account");
 
-    const emailCard = $("<div>");
-    emailCard.addClass("form-group");
-    emailCard.append('<label for="email-input">Email</label>');
-    emailCard.append('<input class="form-control" id="email-input" type="email" placeholder="email">');
-    $("#name-input").parent().after(emailCard);
+    const nameCard = $("<div>");
+    nameCard.addClass("form-group");
+    nameCard.append('<label for="name-input">Name</label>');
+    nameCard.append('<input class="form-control" id="name-input" type="text" placeholder="name">');
+    $("form").prepend(nameCard);
 
     $("button").remove();
     $("form").append('<button class="btn btn-default" id="acct-create" type="submit">Submit</button>');
 });
 
+function createAccount() {
+    const name = document.querySelector("#name-input");
+    const email = document.querySelector("#email-input");
+    const password = document.querySelector("#pw-input");
+
+    firebase.auth().createUserWithEmailAndPassword(email.value, password.value)
+    .then(function() {
+        firebase.auth().currentUser.updateProfile({displayName: name.value});
+        // render gamepage
+    }).catch(function(err) {
+        alert(err.message);
+    });
+}
+
+$("form").on("click", "button#acct-create", function(event) {
+    event.preventDefault();
+    createAccount();
+});
+
+$("#acct-signin").on("click", function(event) {
+    event.preventDefault();
+    signinAccount();
+});
+
+function signinAccount () {
+    const email = document.querySelector("#email-input");
+    const password = document.querySelector("#pw-input");
+
+    firebase.auth().signInWithEmailAndPassword(email.value, password.value)
+    .then(function() {
+        // render gamepage
+    })
+    .catch(function(err) {
+        alert(err.message);
+    });
+}
+
+
+// firebase.auth().onAuthStateChanged(authStateChangeListener);
+
+// function authStateChangeListener(user) {
+//     //signin
+//     if (user) {
+//         //do login operations
+//         Chat.onlogin();
+//         Game.onlogin();
+//     } else { //signout
+//         window.location.reload();
+//     }
+// }
 
 // const database = firebase.database();
-
-// database.ref().set({
-//     players: null
-// });
-
-// $("#add-player").on("click", function(event) {
-//     event.preventDefault();
-
-//     const name = $("#name-input").val();
-//     const newPlayer = {
-//         name
-//     };
-
-//     database.ref('players').push(newPlayer);
-// });
 
 // Firebase watcher + initial loader HINT: .on("value")
 // database.ref().on("value", function(snapshot) {
