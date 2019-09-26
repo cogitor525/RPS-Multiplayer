@@ -19,7 +19,7 @@ function createAccount() {
     firebase.auth().createUserWithEmailAndPassword(email.value, password.value)
     .then(function() {
         firebase.auth().currentUser.updateProfile({displayName: name.value});
-        // render gamepage
+        renderGameroom();
     }).catch(function(err) {
         alert(err.message);
     });
@@ -41,13 +41,20 @@ function signinAccount () {
 
     firebase.auth().signInWithEmailAndPassword(email.value, password.value)
     .then(function() {
-        // render gamepage
+        renderGameroom();
     })
     .catch(function(err) {
         alert(err.message);
     });
 }
 
+function renderGameroom() {
+    $("div.row").empty();
+
+    // refer to assets/html/gameroom.html to see formatted layout of following code
+    $("div.row").append('<div class="offset-lg-1 col-lg-4"><div class="card"><div class="card-header"></div><div class="card-body"></div></div></div><div class="col-lg-3"><div class="card"><div class="card-header"><h3 class="text-center">Games</h3></div><div class="card-body"></div></div></div><div class="col-lg-3"><div class="card"><div class="card-header"><h3 class="text-center">Chatroom</h3></div><div class="card-body"></div></div></div>');
+
+}
 
 // firebase.auth().onAuthStateChanged(authStateChangeListener);
 
