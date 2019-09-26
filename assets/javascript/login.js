@@ -58,29 +58,6 @@ function renderGameroom() {
     // for chatroom
     $("#chat-room").append('<form role="form"><div class="form-group"><textarea class="form-control" id="chat-msg" rows="1" placeholder="chat here..."></textarea></div><button class="btn btn-default" id="send-chat" type="submit">Send</button></form>');
 
+    // for gamelist
+    $("#game-list").append('<button class="btn btn-default" id="new-game" type="button">Open new game</button>');    
 }
-
-// firebase.auth().onAuthStateChanged(authStateChangeListener);
-
-// function authStateChangeListener(user) {
-//     //signin
-//     if (user) {
-//         //do login operations
-//         Chat.onlogin();
-//         Game.onlogin();
-//     } else { //signout
-//         window.location.reload();
-//     }
-// }
-
-
-// Firebase watcher + initial loader HINT: .on("value")
-// database.ref().on("value", function(snapshot) {
-//     const user = snapshot.val().recentUser;
-//     console.log(user);
-
-//     $("#name-display").text(user.name);
-//     $("#email-display").text(user.email);
-//     $("#age-display").text(user.age);
-//     $("#comment-display").text(user.comment);
-// });

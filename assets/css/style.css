@@ -5,3 +5,12 @@
 .btn:hover {
     background-color: green;
 }
+
+.disabled:hover {
+    background-color: lightgray;
+}
+
+#paper {
+    margin-left: 25px;
+    margin-right: 25px;
+}
