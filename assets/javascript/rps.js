@@ -2,6 +2,8 @@ $("div.row").on("click", "button.rps", function(event) {
     const rpsHand = $(this).attr('id');
 
     $("#new-game").text("You played: " + rpsHand);
+
+    // need to restore these buttons after turn is resolved
     $(".rps").addClass('disabled');
     $(".rps").prop("disabled", true);
 
@@ -22,7 +24,7 @@ function enterMove(move) {
             isCreator = false;
         }
 
-        if (game.state == STATE.JOINED) {
+        if ( (game.state == STATE.JOINED) || (game.state == STATE.RESUME) ) {
             game.state = STATE.ONE_MOVED;
         } else if (game.state == STATE.ONE_MOVED) {
             game.state = STATE.BOTH_MOVED;
@@ -40,27 +42,29 @@ bothMoved.on("child_added", function(snapshot) {
         const joinerMove = snapshot.val().joiner.move;
 
         const winLoss = resolveTurn(creatorMove,joinerMove);
-        updateScore(winLoss);
+        updateScoreFirst(winLoss);
     }
 });
 
-function updateScore(winLoss) {
+function updateScoreFirst(creatorWL) {
     refGames.child(currentGameKey).transaction(function(game) {
         let message;
-        if (winLoss == "win") {
+        if (creatorWL == "win") {
             game.creator.wins++;
+            game.winner = "creator";
             message = game.creator.move + " wins over " + game.joiner.move;
-            game.state = STATE.CREATOR_WIN;
-        } else if (winLoss == "loss") {
+        } else if (creatorWL == "loss") {
             game.joiner.wins++;
+            game.winner = "joiner";
             message = game.creator.move + " loses to " + game.joiner.move;
-            game.state = STATE.JOINER_WIN;
-        } else if (winLoss == "tie") {
+        } else if (creatorWL == "tie") {
+            game.winner = "tied";
             message = "tie: both played " + game.creator.move;
-            game.state = STATE.TIED;
         }
         $("#new-game").text(message);
-        game.creator.scored = false;
+        $("#creator-score").text(data.creator.displayName + ": " + data.creator.wins);
+        $("#joiner-score").text(data.joiner.displayName + ": " + data.joiner.wins);
+        game.state = STATE.ONE_SCORED;
         return game;
     });
 }

@@ -2,14 +2,15 @@ $("div.row").on("click", "button#new-game", function(event) {
     newGame();
 });
 
-const STATE = {OPEN: 1, JOINED: 2, ONE_MOVED: 3, BOTH_MOVED: 4, CREATOR_WIN: 5, JOINER_WIN: 6, TIED: 7};
+const STATE = {OPEN: 1, JOINED: 2, ONE_MOVED: 3, BOTH_MOVED: 4, ONE_SCORED: 5, BOTH_SCORED: 6, RESUME: 7};
 const refGames = firebase.database().ref("/games");
 
 function newGame() {
     const user = firebase.auth().currentUser;
 	const openGame = {
 		creator: {uid: user.uid, displayName: user.displayName, wins: 0},
-		state: STATE.OPEN
+        state: STATE.OPEN,
+        winner: null
 	};
     refGames.push().set(openGame)
     .then(function() {
@@ -31,7 +32,10 @@ openGames.on("child_added", function(snapshot) {
 
 function addOpenGameButton(key, data) {
     const name = data.creator.displayName;
-    $("#game-list").append('<br><br><button class="btn btn-default join-game" id="' + key + '" type="button">Join game with ' + name + '</button>');
+    const newButton = $("<div>");
+    newButton.addClass('removable');
+    newButton.append('<br><br><button class="btn btn-default join-game" id="' + key + '" type="button">Join game with ' + name + '</button>');
+    $("#game-list").append(newButton);
 }
 
 $("div.row").on("click", "button.join-game", function(event) {
@@ -71,18 +75,18 @@ joinedGames.on("child_added", function(snapshot) {
         $("#new-game").addClass('disabled');
         $("#new-game").prop("disabled", true);
         $("#new-game").text("Game in progress");
-        $(".join-game").remove();
+        $(".removable").remove();
         const scores = $("<div>");
-        scores.addClass('score');
-        scores.append("<p id='creator-score'>" + data.creator.displayName + ": 0</p>");
+        scores.addClass('score-card');
+        scores.append("<br><br><p id='creator-score'>" + data.creator.displayName + ": 0</p>");
         scores.append("<p id='joiner-score'>" + data.joiner.displayName + ": 0</p>");
-        $("#game-list").append(scores);
+        $("#play-area").append(scores);
     }
 });
 
 function renderRPS() {
     const rpsButtons = $("<div>");
-    rpsButtons.addClass('btn-toolbar');
+    rpsButtons.addClass('rps-buttons');
     rpsButtons.append('<button class="btn btn-default rps" id="rock" type="button">Rock</button>');    
     rpsButtons.append('<button class="btn btn-default rps" id="paper" type="button">Paper</button>');    
     rpsButtons.append('<button class="btn btn-default rps" id="scissors" type="button">Scissors</button>');    
