@@ -1,7 +1,7 @@
-#add-user {
+.btn {
     background-color: lightgray;
 }
 
-#add-user:hover {
+.btn:hover {
     background-color: green;
 }
