@@ -49,10 +49,14 @@ function signinAccount () {
 }
 
 function renderGameroom() {
+    $("div.jumbotron").remove();
     $("div.row").empty();
 
     // refer to assets/html/gameroom.html to see formatted layout of following code
-    $("div.row").append('<div class="offset-lg-1 col-lg-4"><div class="card"><div class="card-header"></div><div class="card-body"></div></div></div><div class="col-lg-3"><div class="card"><div class="card-header"><h3 class="text-center">Games</h3></div><div class="card-body"></div></div></div><div class="col-lg-3"><div class="card"><div class="card-header"><h3 class="text-center">Chatroom</h3></div><div class="card-body"></div></div></div>');
+    $("div.row").append('<div class="offset-lg-1 col-lg-4"><div class="card"><div class="card-header"><h3 class="text-center">Rock Paper Scissors</h3></div><div class="card-body" id="play-area"></div></div></div><div class="col-lg-3"><div class="card"><div class="card-header"><h3 class="text-center">Games</h3></div><div class="card-body" id="game-list"></div></div></div><div class="col-lg-3"><div class="card"><div class="card-header"><h3 class="text-center">Chatroom</h3></div><div class="card-body" id="chat-room"></div></div></div>');
+
+    // for chatroom
+    $("#chat-room").append('<form role="form"><div class="form-group"><textarea class="form-control" id="chat-msg" rows="1" placeholder="chat here..."></textarea></div><button class="btn btn-default" id="send-chat" type="submit">Send</button></form>');
 
 }
 
@@ -69,7 +73,6 @@ function renderGameroom() {
 //     }
 // }
 
-// const database = firebase.database();
 
 // Firebase watcher + initial loader HINT: .on("value")
 // database.ref().on("value", function(snapshot) {
