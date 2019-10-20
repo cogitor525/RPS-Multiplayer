@@ -62,8 +62,6 @@ function updateScoreFirst(creatorWL) {
             message = "tie: both played " + game.creator.move;
         }
         $("#new-game").text(message);
-        $("#creator-score").text(data.creator.displayName + ": " + data.creator.wins);
-        $("#joiner-score").text(data.joiner.displayName + ": " + data.joiner.wins);
         game.state = STATE.ONE_SCORED;
         return game;
     });
