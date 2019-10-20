@@ -1,23 +1,25 @@
 $("div.row").on("click", "button.rps", function(event) {    
-    const rpsHand = $(this).attr('id');
+    const rpsHand = $(this).attr("data-rps");
+    const key = $(this).parents("div.game-card").attr('id');
 
-    $("#new-game").text("You played: " + rpsHand);
+    $("div.game-card#" + key).find("p.game-msg").text("You played: " + rpsHand);
 
     // need to restore these buttons after turn is resolved
-    $(".rps").addClass('disabled');
-    $(".rps").prop("disabled", true);
+    $(this).addClass('disabled').prop("disabled", true);
+    $(this).siblings("button.rps").addClass('disabled').prop("disabled", true);
 
-    enterMove(rpsHand);
+    enterMove(key, rpsHand);
 });
 
+// **
 let isCreator;
 
-function enterMove(move) {
-    refGames.child(currentGameKey).transaction(function(game) {
-        if (currentUser.uid == game.creator.uid) {
+function enterMove(key, move) {
+    refGames.child(key).transaction(function(game) {
+        if (currentUserId == game.creator.uid) {
             game.creator.move = move;
             isCreator = true;
-        } else if (currentUser.uid == game.joiner.uid) {
+        } else if (currentUserId == game.joiner.uid) {
             game.joiner.move = move;
             isCreator = false;
         }
@@ -40,12 +42,12 @@ bothMoved.on("child_added", function(snapshot) {
         const joinerMove = snapshot.val().joiner.move;
 
         const winLoss = resolveTurn(creatorMove,joinerMove);
-        updateScoreFirst(winLoss);
+        updateScoreFirst(snapshot.key, winLoss);
     }
 });
 
-function updateScoreFirst(creatorWL) {
-    refGames.child(currentGameKey).transaction(function(game) {
+function updateScoreFirst(key, creatorWL) {
+    refGames.child(key).transaction(function(game) {
         let message;
         if (creatorWL == "win") {
             game.creator.wins++;
@@ -59,7 +61,7 @@ function updateScoreFirst(creatorWL) {
             game.winner = "tied";
             message = "tie: both played " + game.creator.move;
         }
-        $("#new-game").text(message);
+        $("div.game-card#" + key).find("p.game-msg").text(message);
         game.state = STATE.ONE_SCORED;
         return game;
     });

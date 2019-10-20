@@ -7,7 +7,7 @@ const refGames = firebase.database().ref("/games");
 
 function newGame() {
 	const openGame = {
-		creator: {uid: currentUser.uid, displayName: currentUser.displayName, wins: 0},
+		creator: {uid: currentUserId, displayName: currentUserName, wins: 0},
         state: STATE.OPEN,
         winner: null
 	};
@@ -24,7 +24,7 @@ const openGames = refGames.orderByChild("state").equalTo(STATE.OPEN);
 openGames.on("child_added", function(snapshot) {
 	const data = snapshot.val();
 
-	if (data.creator.uid != currentUser.uid) {
+	if (data.creator.uid != currentUserId) {
 		addOpenGameButton(snapshot.key, data);
 	}
 });
@@ -46,7 +46,7 @@ function joinGame(key) {
         refGames.child(key).transaction(function(game) {
         if (!game.joiner) {
             game.state = STATE.JOINED;
-            game.joiner = {uid: currentUser.uid, displayName: currentUser.displayName, wins: 0};
+            game.joiner = {uid: currentUserId, displayName: currentUserName, wins: 0};
         }
         return game;
     });
@@ -60,32 +60,37 @@ openGames.on("child_removed", function(snapshot) {
 });
 
 const joinedGames = refGames.orderByChild("state").equalTo(STATE.JOINED);
-let currentGameKey;
 
 joinedGames.on("child_added", function(snapshot) {
     const data = snapshot.val();
 
-    if ( (currentUser.uid == data.creator.uid) || (currentUser.uid == data.joiner.uid) ) {
-        currentGameKey = snapshot.key;
-        renderRPS();
+    if ( (currentUserId == data.creator.uid) || (currentUserId == data.joiner.uid) ) {
+        renderRPS(snapshot.key);
         $("#new-game").addClass('disabled');
         $("#new-game").prop("disabled", true);
         $("#new-game").text("Game in progress");
         $(".removable").remove();
+
         const scores = $("<div>");
         scores.addClass('score-card');
-        scores.append("<br><br><p id='creator-score'>" + data.creator.displayName + ": 0</p>");
-        scores.append("<p id='joiner-score'>" + data.joiner.displayName + ": 0</p>");
-        $("#play-area").append(scores);
+        scores.append("<br><p class='game-msg'>Good luck!</p>");
+        scores.append("<p class='creator-score'>" + data.creator.displayName + ": 0</p>");
+        scores.append("<p class='joiner-score'>" + data.joiner.displayName + ": 0</p>");
+        $("div.game-card#" + snapshot.key).append(scores);
     }
 });
 
-function renderRPS() {
+function renderRPS(key) {
+    const gameCard = $("<div>");
+    gameCard.addClass('game-card');
+    gameCard.attr('id', key);
+
     const rpsButtons = $("<div>");
     rpsButtons.addClass('rps-buttons');
-    rpsButtons.append('<button class="btn btn-default rps" id="rock" type="button">Rock</button>');    
-    rpsButtons.append('<button class="btn btn-default rps" id="paper" type="button">Paper</button>');    
-    rpsButtons.append('<button class="btn btn-default rps" id="scissors" type="button">Scissors</button>');    
+    rpsButtons.append('<button class="btn btn-default rps" data-rps="rock" type="button">Rock</button>');    
+    rpsButtons.append('<button class="btn btn-default rps" data-rps="paper" type="button">Paper</button>');    
+    rpsButtons.append('<button class="btn btn-default rps" data-rps="scissors" type="button">Scissors</button>');    
 
-    $("#play-area").append(rpsButtons);
+    gameCard.append(rpsButtons);
+    $("#play-area").append(gameCard);
 }

@@ -8,7 +8,7 @@ function sendChatMsg() {
     const chatMsg = document.querySelector("#chat-msg");
 
     refChat.push().set({
-        name: firebase.auth().currentUser.displayName,
+        name: currentUserName,
         message: chatMsg.value
     });
 }

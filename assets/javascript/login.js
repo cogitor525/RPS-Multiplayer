@@ -11,7 +11,8 @@ $("#acct-new").on("click", function(event) {
     $("form").append('<button class="btn btn-default" id="acct-create" type="submit">Submit</button>');
 });
 
-let currentUser;
+let currentUserName;
+let currentUserId;
 
 function createAccount() {
     const name = document.querySelector("#name-input");
@@ -21,7 +22,8 @@ function createAccount() {
     firebase.auth().createUserWithEmailAndPassword(email.value, password.value)
     .then(function() {
         firebase.auth().currentUser.updateProfile({displayName: name.value});
-        currentUser = firebase.auth().currentUser;
+        currentUserName = firebase.auth().currentUser.displayName;
+        currentUserId = firebase.auth().currentUser.uid;
         renderGameroom();
     }).catch(function(err) {
         alert(err.message);
@@ -44,7 +46,8 @@ function signinAccount () {
 
     firebase.auth().signInWithEmailAndPassword(email.value, password.value)
     .then(function() {
-        currentUser = firebase.auth().currentUser;
+        currentUserName = firebase.auth().currentUser.displayName;
+        currentUserId = firebase.auth().currentUser.uid;
         renderGameroom();
     })
     .catch(function(err) {
