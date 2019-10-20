@@ -14,12 +14,10 @@ let isCreator;
 
 function enterMove(move) {
     refGames.child(currentGameKey).transaction(function(game) {
-        const user = firebase.auth().currentUser;
-
-        if (user.uid == game.creator.uid) {
+        if (currentUser.uid == game.creator.uid) {
             game.creator.move = move;
             isCreator = true;
-        } else if (user.uid == game.joiner.uid) {
+        } else if (currentUser.uid == game.joiner.uid) {
             game.joiner.move = move;
             isCreator = false;
         }

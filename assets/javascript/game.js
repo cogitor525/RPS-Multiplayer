@@ -6,9 +6,8 @@ const STATE = {OPEN: 1, JOINED: 2, ONE_MOVED: 3, BOTH_MOVED: 4, ONE_SCORED: 5, B
 const refGames = firebase.database().ref("/games");
 
 function newGame() {
-    const user = firebase.auth().currentUser;
 	const openGame = {
-		creator: {uid: user.uid, displayName: user.displayName, wins: 0},
+		creator: {uid: currentUser.uid, displayName: currentUser.displayName, wins: 0},
         state: STATE.OPEN,
         winner: null
 	};
@@ -25,7 +24,7 @@ const openGames = refGames.orderByChild("state").equalTo(STATE.OPEN);
 openGames.on("child_added", function(snapshot) {
 	const data = snapshot.val();
 
-	if (data.creator.uid != firebase.auth().currentUser.uid) {
+	if (data.creator.uid != currentUser.uid) {
 		addOpenGameButton(snapshot.key, data);
 	}
 });
@@ -44,12 +43,10 @@ $("div.row").on("click", "button.join-game", function(event) {
 });
 
 function joinGame(key) {
-    const user = firebase.auth().currentUser;
-
-    refGames.child(key).transaction(function(game) {
+        refGames.child(key).transaction(function(game) {
         if (!game.joiner) {
             game.state = STATE.JOINED;
-            game.joiner = {uid: user.uid, displayName: user.displayName, wins: 0};
+            game.joiner = {uid: currentUser.uid, displayName: currentUser.displayName, wins: 0};
         }
         return game;
     });
@@ -67,9 +64,8 @@ let currentGameKey;
 
 joinedGames.on("child_added", function(snapshot) {
     const data = snapshot.val();
-    const user = firebase.auth().currentUser;
 
-    if ( (user.uid == data.creator.uid) || (user.uid == data.joiner.uid) ) {
+    if ( (currentUser.uid == data.creator.uid) || (currentUser.uid == data.joiner.uid) ) {
         currentGameKey = snapshot.key;
         renderRPS();
         $("#new-game").addClass('disabled');
